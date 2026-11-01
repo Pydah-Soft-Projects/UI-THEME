@@ -139,6 +139,12 @@ jobs:
             "${PROJECT_DIR}/public/" \
             "${STATIC_THEMES_ROOT}/"
 
+          # Mirror themes into frontend root as well so both /var/www/themes/public
+          # and /var/www/themes/frontend can serve /themes/* seamlessly without 404
+          sudo mkdir -p "${FRONTEND_WEB_ROOT}/themes"
+          sudo cp -r "${PROJECT_DIR}/public/themes/"* "${FRONTEND_WEB_ROOT}/themes/" 2>/dev/null || true
+          sudo cp -r "${PROJECT_DIR}/public/"* "${FRONTEND_WEB_ROOT}/" 2>/dev/null || true
+
           #################################################
           # PM2 (BACKEND PROCESS ON PORT 7000)
           #################################################

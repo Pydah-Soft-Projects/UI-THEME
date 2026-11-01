@@ -3,7 +3,7 @@
   "name": "Forest Green Light",
   "description": "Institutional theme with deep forest green brand accents",
   "version": "1.0.1",
-  "lastPublished": "2026-11-01T11:36:51.152Z",
+  "lastPublished": "2026-11-01T11:53:43.487Z",
   "colors": {
     "brand": {
       "primary": "#0055AA",
@@ -37,5 +37,5 @@
       "info": "#0D6EFD"
     }
   },
-  "updatedAt": "2026-11-01T11:36:51.139Z"
+  "updatedAt": "2026-11-01T11:53:43.470Z"
 }

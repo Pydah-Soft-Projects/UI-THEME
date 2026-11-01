@@ -12,11 +12,11 @@ export default function DocsModal({ isOpen, onClose }) {
     setTimeout(() => setCopiedIndex(null), 1500);
   };
 
-  const htmlSnippet = `<!-- Add to public/index.html <head> of any connected portal -->
+  const htmlSnippet = `<!-- Production Tag: Add to index.html <head> of any connected portal -->
 <script 
-  src="http://localhost:7000/themes/theme-loader.js" 
-  data-theme-server="http://localhost:7000"
-  data-poll-interval="10">
+  src="https://ui-theme.pydah.edu.in/themes/theme-loader.js" 
+  data-theme-server="https://ui-theme.pydah.edu.in"
+  data-poll-interval="30">
 </script>`;
 
   const reactSnippet = `// In React App.jsx / main.jsx

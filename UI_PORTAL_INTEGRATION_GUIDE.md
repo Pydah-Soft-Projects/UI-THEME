@@ -1,12 +1,11 @@
 # Connected Application Theme Integration Guide
-
 ### Page-by-Page Migration & Centralized Runtime Theme Consumption
 
-> **Service Endpoint**: `http://localhost:7000` (Local) / Configurable Production URL
-> **Theme Editor**: `http://localhost:7001`
-> **Distributable CSS**: `http://localhost:7000/themes/theme.css`
-> **Runtime Loader SDK**: `http://localhost:7000/themes/theme-loader.js`
-> **Version Target**: `http://localhost:7000/themes/version.json`
+> **Production Service**: `https://ui-theme.pydah.edu.in`  
+> **Local Service**: `http://localhost:7000` (Theme Server) / `http://localhost:7001` (Theme Editor)  
+> **Production Distributable CSS**: `https://ui-theme.pydah.edu.in/themes/theme.css`  
+> **Production Runtime Loader SDK**: `https://ui-theme.pydah.edu.in/themes/theme-loader.js`  
+> **Version Polling Target**: `https://ui-theme.pydah.edu.in/themes/version.json`  
 
 ---
 
@@ -15,7 +14,6 @@
 When connecting an existing portal (Vite, Next.js, Create-React-App, Vue, Vanilla HTML) that already has disparate, hardcoded colors scattered across multiple pages, **do not attempt to replace all colors at once**.
 
 Follow this **page-by-page migration process**:
-
 1. **Load the centralized stylesheet** (takes 2 minutes).
 2. **Review the Master Token Dictionary** below to map your existing hardcoded colors.
 3. **Migrate Page 0 (Layout Shell: Sidebar & Navbar)**.
@@ -26,18 +24,33 @@ Follow this **page-by-page migration process**:
 
 ## 2. Quick Setup (Step 1)
 
-### Option A: Standard React / Vite / Vanilla HTML App
+### Production Integration Tag (Recommended for Live Portals)
 
-Add the loader inside your portal's `index.html` `<head>`:
+Add this script tag inside your portal's `index.html` `<head>`:
 
 ```html
-<!-- Centralized Theme Runtime Loader -->
+<!-- Centralized Theme Runtime Loader (Production) -->
+<script 
+  src="https://ui-theme.pydah.edu.in/themes/theme-loader.js" 
+  data-theme-server="https://ui-theme.pydah.edu.in"
+  data-poll-interval="30">
+</script>
+```
+
+---
+
+### Local Development Tag (When Testing Locally)
+
+```html
+<!-- Centralized Theme Runtime Loader (Local Testing) -->
 <script 
   src="http://localhost:7000/themes/theme-loader.js" 
   data-theme-server="http://localhost:7000"
   data-poll-interval="10">
 </script>
 ```
+
+---
 
 ### Option B: Next.js (App Router: `app/layout.jsx` or `app/layout.tsx`)
 
@@ -47,18 +60,22 @@ In your root layout:
 import Script from 'next/script';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const themeServer = process.env.NODE_ENV === 'production' 
+    ? 'https://ui-theme.pydah.edu.in' 
+    : 'http://localhost:7000';
+
   return (
     <html lang="en">
       <head>
         {/* Load theme loader before interactive to prevent flash */}
         <Script
-          src="http://localhost:7000/themes/theme-loader.js"
+          src={`${themeServer}/themes/theme-loader.js`}
           strategy="beforeInteractive"
-          data-theme-server="http://localhost:7000"
-          data-poll-interval="10"
+          data-theme-server={themeServer}
+          data-poll-interval={process.env.NODE_ENV === 'production' ? 30 : 10}
         />
         {/* Direct CSS link fallback */}
-        <link rel="stylesheet" href="http://localhost:7000/themes/theme.css" />
+        <link rel="stylesheet" href={`${themeServer}/themes/theme.css`} />
       </head>
       <body>{children}</body>
     </html>
@@ -66,19 +83,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
+---
+
 ### Option C: Next.js (Pages Router: `pages/_document.jsx`)
 
 ```jsx
 import { Html, Head, Main, NextScript } from 'next/document';
 
 export default function Document() {
+  const themeServer = process.env.NODE_ENV === 'production'
+    ? 'https://ui-theme.pydah.edu.in'
+    : 'http://localhost:7000';
+
   return (
     <Html lang="en">
       <Head>
         <script 
-          src="http://localhost:7000/themes/theme-loader.js" 
-          data-theme-server="http://localhost:7000" 
-          data-poll-interval="10" 
+          src={`${themeServer}/themes/theme-loader.js`}
+          data-theme-server={themeServer} 
+          data-poll-interval={process.env.NODE_ENV === 'production' ? 30 : 10}
         />
       </Head>
       <body>
@@ -96,30 +119,30 @@ export default function Document() {
 
 Every color needed across an enterprise application is standardized into these CSS Custom Properties:
 
-| Category                      | CSS Variable                                    | What It Replaces in Existing Portals                                 | Example Usage                                   |
-| ----------------------------- | ----------------------------------------------- | -------------------------------------------------------------------- | ----------------------------------------------- |
-| **Brand Primary**       | `var(--primary)`                              | Main brand buttons, active tabs, header highlights                   | `background: var(--primary);`                 |
-| **Brand Hover**         | `var(--primary-hover)`                        | Button `:hover` and `:focus` states                              | `background: var(--primary-hover);`           |
-| **Brand Light Tint**    | `var(--primary-light)`                        | Active nav item background, selected table rows                      | `background: var(--primary-light);`           |
-| **Brand RGB (Opacity)** | `var(--primary-rgb)`                          | Transparent overlays, shadows, glassmorphism                         | `background: rgba(var(--primary-rgb), 0.15);` |
-| **Brand Secondary**     | `var(--secondary)`                            | Secondary action buttons, badge accents                              | `background: var(--secondary);`               |
-| **Accent / Highlight**  | `var(--accent)`                               | KPI callouts, progress bars, chart accents                           | `color: var(--accent);`                       |
-| **Shade Scales**        | `var(--primary-50)` to `var(--primary-900)` | 10 automatic lightness steps (50 is lightest, 900 is darkest)        | `border-color: var(--primary-200);`           |
-| **Page Canvas**         | `var(--background)`                           | Global body background (replaces `#f7f9f7`, `#f8fafc`, `#fff`) | `background-color: var(--background);`        |
-| **Card / Surface**      | `var(--surface)`                              | Card boxes, table containers, dropdown menus, modals                 | `background-color: var(--surface);`           |
-| **Sidebar BG**          | `var(--sidebar)`                              | Navigation sidebar background                                        | `background-color: var(--sidebar);`           |
-| **Sidebar Text**        | `var(--sidebar-text)`                         | Nav link text in dark or light sidebars                              | `color: var(--sidebar-text);`                 |
-| **Sidebar Muted**       | `var(--sidebar-muted)`                        | Nav category labels, icons in sidebar                                | `color: var(--sidebar-muted);`                |
-| **Navbar BG**           | `var(--navbar)`                               | Top navigation bar background                                        | `background-color: var(--navbar);`            |
-| **Text (Primary)**      | `var(--text-primary)`                         | Main headings (`h1`, `h2`), high-contrast body text              | `color: var(--text-primary);`                 |
-| **Text (Secondary)**    | `var(--text-secondary)`                       | Subtitles, labels, table headers, descriptions                       | `color: var(--text-secondary);`               |
-| **Text (Muted)**        | `var(--text-muted)`                           | Timestamps, placeholder text, hints                                  | `color: var(--text-muted);`                   |
-| **Borders**             | `var(--border)`                               | Subtle card dividers, table borders, panel separators                | `border: 1px solid var(--border);`            |
-| **Strong Borders**      | `var(--border-strong)`                        | Form input borders, active outlines, table headers                   | `border: 1px solid var(--border-strong);`     |
-| **Success**             | `var(--success)`                              | Paid badges, approved statuses, positive counters                    | `color: var(--success);`                      |
-| **Warning**             | `var(--warning)`                              | Pending reviews, cautionary alerts, late warnings                    | `color: var(--warning);`                      |
-| **Danger**              | `var(--danger)`                               | Overdue fees, failed actions, delete buttons                         | `color: var(--danger);`                       |
-| **Info**                | `var(--info)`                                 | Academic notices, informational alerts                               | `color: var(--info);`                         |
+| Category | CSS Variable | What It Replaces in Existing Portals | Example Usage |
+|---|---|---|---|
+| **Brand Primary** | `var(--primary)` | Main brand buttons, active tabs, header highlights | `background: var(--primary);` |
+| **Brand Hover** | `var(--primary-hover)` | Button `:hover` and `:focus` states | `background: var(--primary-hover);` |
+| **Brand Light Tint** | `var(--primary-light)` | Active nav item background, selected table rows | `background: var(--primary-light);` |
+| **Brand RGB (Opacity)** | `var(--primary-rgb)` | Transparent overlays, shadows, glassmorphism | `background: rgba(var(--primary-rgb), 0.15);` |
+| **Brand Secondary** | `var(--secondary)` | Secondary action buttons, badge accents | `background: var(--secondary);` |
+| **Accent / Highlight** | `var(--accent)` | KPI callouts, progress bars, chart accents | `color: var(--accent);` |
+| **Shade Scales** | `var(--primary-50)` to `var(--primary-900)` | 10 automatic lightness steps (50 is lightest, 900 is darkest) | `border-color: var(--primary-200);` |
+| **Page Canvas** | `var(--background)` | Global body background (replaces `#f7f9f7`, `#f8fafc`, `#fff`) | `background-color: var(--background);` |
+| **Card / Surface** | `var(--surface)` | Card boxes, table containers, dropdown menus, modals | `background-color: var(--surface);` |
+| **Sidebar BG** | `var(--sidebar)` | Navigation sidebar background | `background-color: var(--sidebar);` |
+| **Sidebar Text** | `var(--sidebar-text)` | Nav link text in dark or light sidebars | `color: var(--sidebar-text);` |
+| **Sidebar Muted** | `var(--sidebar-muted)` | Nav category labels, icons in sidebar | `color: var(--sidebar-muted);` |
+| **Navbar BG** | `var(--navbar)` | Top navigation bar background | `background-color: var(--navbar);` |
+| **Text (Primary)** | `var(--text-primary)` | Main headings (`h1`, `h2`), high-contrast body text | `color: var(--text-primary);` |
+| **Text (Secondary)** | `var(--text-secondary)` | Subtitles, labels, table headers, descriptions | `color: var(--text-secondary);` |
+| **Text (Muted)** | `var(--text-muted)` | Timestamps, placeholder text, hints | `color: var(--text-muted);` |
+| **Borders** | `var(--border)` | Subtle card dividers, table borders, panel separators | `border: 1px solid var(--border);` |
+| **Strong Borders** | `var(--border-strong)` | Form input borders, active outlines, table headers | `border: 1px solid var(--border-strong);` |
+| **Success** | `var(--success)` | Paid badges, approved statuses, positive counters | `color: var(--success);` |
+| **Warning** | `var(--warning)` | Pending reviews, cautionary alerts, late warnings | `color: var(--warning);` |
+| **Danger** | `var(--danger)` | Overdue fees, failed actions, delete buttons | `color: var(--danger);` |
+| **Info** | `var(--info)` | Academic notices, informational alerts | `color: var(--info);` |
 
 ---
 
@@ -183,7 +206,6 @@ module.exports = {
 ```
 
 **Now existing Tailwind utility classes automatically inherit central themes**:
-
 - `bg-primary` -> automatically updates to the active theme color!
 - `bg-surface` -> automatically updates to surface!
 - `text-primary` -> automatically adapts!
@@ -196,7 +218,6 @@ module.exports = {
 To avoid breaking existing pages, migrate in this sequence:
 
 ### Step 5.1: Global Shell (`Navbar` & `Sidebar`)
-
 Open your root layout or main shell component:
 
 ```diff
@@ -215,7 +236,6 @@ Open your root layout or main shell component:
 ---
 
 ### Step 5.2: Dashboard Page (`Dashboard.jsx`)
-
 On your dashboard overview, update the canvas background and KPI metric cards:
 
 ```diff
@@ -224,10 +244,10 @@ On your dashboard overview, update the canvas background and KPI metric cards:
 
 - <div className="metric-card" style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}>
 + <div className="metric-card" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
-  
+    
 -   <h3 style={{ color: '#64748b' }}>Total Revenue</h3>
 +   <h3 style={{ color: 'var(--text-secondary)' }}>Total Revenue</h3>
-  
+    
 -   <span style={{ color: '#0f172a' }}>$48,500</span>
 +   <span style={{ color: 'var(--text-primary)' }}>$48,500</span>
   </div>
@@ -236,7 +256,6 @@ On your dashboard overview, update the canvas background and KPI metric cards:
 ---
 
 ### Step 5.3: Data Tables & List Views (`StudentsList.jsx`, `Orders.jsx`)
-
 Update table containers, headers, row borders, and status tags:
 
 ```diff
@@ -266,7 +285,6 @@ Update table containers, headers, row borders, and status tags:
 ---
 
 ### Step 5.4: Forms & Input Controls (`AdmissionForm.jsx`, `Settings.jsx`)
-
 Update inputs, labels, and action buttons:
 
 ```diff
@@ -287,7 +305,6 @@ Update inputs, labels, and action buttons:
 ---
 
 ### Step 5.5: Modals, Popovers & Dialogs (`ConfirmModal.jsx`)
-
 ```diff
   <div className="modal-backdrop" style={{ background: 'rgba(0, 0, 0, 0.45)' }}>
 -   <div className="modal-window" style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}>
@@ -349,8 +366,7 @@ export default function MyComponent() {
 
 ## 8. Offline & Server Outage Resilience
 
-If the central theme server (`http://localhost:7000`) is down or experiencing network issues:
-
+If the central theme server is down or experiencing temporary network issues:
 - `theme-loader.js` **preserves the last successfully loaded theme** stored in `localStorage`.
 - If the application is opened for the first time while offline, the loader injects standard fallback tokens automatically.
 - **Your application will never crash or display blank unstyled pages**.
