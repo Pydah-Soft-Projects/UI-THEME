@@ -1,0 +1,41 @@
+{
+  "id": "teal-sage-light",
+  "name": "Teal & Sage Polytechnic",
+  "description": "Modern technical institute palette with deep ocean teal, sage greens, and clean mint surfaces",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-01T10:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#0D5C75",
+      "primaryHover": "#084152",
+      "primaryLight": "#E6F4F8",
+      "secondary": "#2A9D8F",
+      "accent": "#E76F51"
+    },
+    "backgrounds": {
+      "background": "#F4F9FA",
+      "surface": "#FFFFFF",
+      "sidebar": "#084152",
+      "sidebarText": "#FFFFFF",
+      "sidebarMuted": "#99CBD9",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#D9E9ED"
+    },
+    "typography": {
+      "textPrimary": "#17292F",
+      "textSecondary": "#47616A",
+      "textMuted": "#7D98A1"
+    },
+    "borders": {
+      "border": "#D9E9ED",
+      "borderStrong": "#BDD6DC"
+    },
+    "semantic": {
+      "success": "#2A9D8F",
+      "warning": "#E9C46A",
+      "danger": "#E76F51",
+      "info": "#264653"
+    }
+  }
+}
+

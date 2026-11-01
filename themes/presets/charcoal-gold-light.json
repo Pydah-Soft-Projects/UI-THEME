@@ -1,0 +1,41 @@
+{
+  "id": "charcoal-gold-light",
+  "name": "Charcoal & Bronze Executive",
+  "description": "Refined executive business school theme with charcoal slate, rich bronze accents, and warm ivory backgrounds",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-01T10:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#334155",
+      "primaryHover": "#1E293B",
+      "primaryLight": "#F1F5F9",
+      "secondary": "#B45309",
+      "accent": "#059669"
+    },
+    "backgrounds": {
+      "background": "#FAFAF9",
+      "surface": "#FFFFFF",
+      "sidebar": "#1E293B",
+      "sidebarText": "#F8FAFC",
+      "sidebarMuted": "#94A3B8",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#E7E5E4"
+    },
+    "typography": {
+      "textPrimary": "#1C1917",
+      "textSecondary": "#57534E",
+      "textMuted": "#8D857E"
+    },
+    "borders": {
+      "border": "#E7E5E4",
+      "borderStrong": "#D6D3D1"
+    },
+    "semantic": {
+      "success": "#15803D",
+      "warning": "#B45309",
+      "danger": "#B91C1C",
+      "info": "#2563EB"
+    }
+  }
+}
+

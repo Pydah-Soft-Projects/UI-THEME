@@ -1,0 +1,168 @@
+name: Deploy Theme System to Production (theme.pydah.edu.in)
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: production-theme-system
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy to AWS Lightsail
+    runs-on: ubuntu-latest
+
+    steps:
+      #################################################
+      # 1. Checkout repository
+      #################################################
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      #################################################
+      # 2. Setup Node.js for frontend build
+      #################################################
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      #################################################
+      # 3. Build Theme Editor frontend on GitHub Actions
+      #################################################
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: |
+          npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm run build
+
+      #################################################
+      # 4. Configure SSH
+      #################################################
+      - name: Configure SSH
+        run: |
+          set -e
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.SERVER_IP }}" >> ~/.ssh/known_hosts
+
+      #################################################
+      # 5. Upload frontend build to server
+      #################################################
+      - name: Upload frontend build
+        run: |
+          rsync -avz \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            frontend/dist/ \
+            "ec2-user@${{ secrets.SERVER_IP }}:/tmp/theme-editor-dist/"
+
+      #################################################
+      # 6. Deploy on Lightsail Server
+      #################################################
+      - name: Deploy to server
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+        run: |
+          set -e
+          ssh -i ~/.ssh/deploy_key \
+            -o StrictHostKeyChecking=yes \
+            -o BatchMode=yes \
+            "ec2-user@${SERVER_IP}" << 'ENDSSH'
+
+          set -e
+
+          PROJECT_DIR="/home/ec2-user/theme-suite"
+          FRONTEND_WEB_ROOT="/var/www/themes/frontend"
+          STATIC_THEMES_ROOT="/var/www/themes/public"
+
+          echo "=========================================="
+          echo "Starting Theme System Deployment"
+          echo "Domain: theme.pydah.edu.in"
+          echo "=========================================="
+
+          cd "${PROJECT_DIR}"
+
+          echo "==> Pulling latest code from main..."
+          git fetch origin main
+          git checkout main
+
+          # Protect server's active themes & history from merge conflicts
+          git checkout -- server/ scripts/ package.json package-lock.json 2>/dev/null || true
+          git pull origin main
+
+          #################################################
+          # BACKEND DEPENDENCIES & COMPILATION
+          #################################################
+          echo "==> Checking backend dependencies..."
+          LOCK_HASH_FILE="${PROJECT_DIR}/.npm-ci-lockhash"
+          CURRENT_HASH="$(sha256sum package-lock.json package.json 2>/dev/null | sha256sum | awk '{print $1}')"
+          PREV_HASH="$(cat "${LOCK_HASH_FILE}" 2>/dev/null || true)"
+
+          if [ ! -d node_modules ] || [ "${CURRENT_HASH}" != "${PREV_HASH}" ]; then
+            echo "==> Installing backend dependencies..."
+            if [ -f package-lock.json ]; then
+              npm ci --omit=dev
+            else
+              npm install --omit=dev
+            fi
+            echo "${CURRENT_HASH}" > "${LOCK_HASH_FILE}"
+          else
+            echo "==> Backend dependencies unchanged, skipping npm install"
+          fi
+
+          # Ensure theme.css is compiled on server from active-theme.json
+          node scripts/generate-css.js
+
+          #################################################
+          # DEPLOY STATIC ASSETS FOR NGINX
+          #################################################
+          echo "==> Deploying Theme Editor & Static Distribution..."
+          sudo mkdir -p "${FRONTEND_WEB_ROOT}"
+          sudo mkdir -p "${STATIC_THEMES_ROOT}"
+
+          # Deploy Theme Editor frontend SPA
+          sudo rsync -av --delete \
+            /tmp/theme-editor-dist/ \
+            "${FRONTEND_WEB_ROOT}/"
+
+          # Deploy public distribution files (theme.css, theme-loader.js, version.json)
+          sudo rsync -av \
+            "${PROJECT_DIR}/public/" \
+            "${STATIC_THEMES_ROOT}/"
+
+          #################################################
+          # PM2 (BACKEND PROCESS ON PORT 7000)
+          #################################################
+          echo "==> Reloading PM2 process via ecosystem.config.js..."
+          cd "${PROJECT_DIR}"
+          pm2 startOrReload ecosystem.config.js --update-env
+
+          echo "==> Saving PM2 process list..."
+          pm2 save
+
+          #################################################
+          # CLEANUP
+          #################################################
+          rm -rf /tmp/theme-editor-dist
+
+          echo "=========================================="
+          echo "Deployment to theme.pydah.edu.in completed successfully"
+          echo "=========================================="
+
+          ENDSSH
+
+      #################################################
+      # 7. Cleanup SSH key on GitHub Actions runner
+      #################################################
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

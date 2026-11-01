@@ -1,0 +1,40 @@
+{
+  "id": "forest-green-light",
+  "name": "Forest Green Light",
+  "description": "Institutional theme with deep forest green brand accents",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-01T10:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#145A3A",
+      "primaryHover": "#10452E",
+      "primaryLight": "#E5F2E9",
+      "secondary": "#287A50",
+      "accent": "#0E8388"
+    },
+    "backgrounds": {
+      "background": "#F7F9F7",
+      "surface": "#FFFFFF",
+      "sidebar": "#145A3A",
+      "sidebarText": "#FFFFFF",
+      "sidebarMuted": "#A1CBB7",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#E5EAE6"
+    },
+    "typography": {
+      "textPrimary": "#252B27",
+      "textSecondary": "#5B645E",
+      "textMuted": "#8D9790"
+    },
+    "borders": {
+      "border": "#E5EAE6",
+      "borderStrong": "#CBD5CE"
+    },
+    "semantic": {
+      "success": "#198754",
+      "warning": "#F0AD4E",
+      "danger": "#DC3545",
+      "info": "#0D6EFD"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "emerald-light",
+  "name": "Emerald Light",
+  "description": "Vibrant emerald green campus palette with fresh mint highlights and crisp clean borders",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-01T10:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#059669",
+      "primaryHover": "#047857",
+      "primaryLight": "#ECFDF5",
+      "secondary": "#0D9488",
+      "accent": "#0284C7"
+    },
+    "backgrounds": {
+      "background": "#F6FBF8",
+      "surface": "#FFFFFF",
+      "sidebar": "#064E3B",
+      "sidebarText": "#ECFDF5",
+      "sidebarMuted": "#6EE7B7",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#D1FAE5"
+    },
+    "typography": {
+      "textPrimary": "#06281E",
+      "textSecondary": "#335C4E",
+      "textMuted": "#6B8E81"
+    },
+    "borders": {
+      "border": "#E1F2E8",
+      "borderStrong": "#C2E5D1"
+    },
+    "semantic": {
+      "success": "#10B981",
+      "warning": "#F59E0B",
+      "danger": "#EF4444",
+      "info": "#0EA5E9"
+    }
+  }
+}

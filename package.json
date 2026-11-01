@@ -1,0 +1,21 @@
+{
+  "name": "centralized-theme-system",
+  "version": "1.0.0",
+  "description": "Centralized Theme Editor & Runtime Theme Management",
+  "scripts": {
+    "start": "node server/server.js",
+    "server": "node server/server.js",
+    "editor": "npm --prefix frontend run dev",
+    "portal": "npm --prefix sample-portal run dev",
+    "test": "node tests/theme-engine.test.js",
+    "dev": "concurrently \"npm run server\" \"npm run editor\" \"npm run portal\"",
+    "generate:css": "node scripts/generate-css.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "id": "crimson-amber-light",
+  "name": "Crimson & Amber Heritage",
+  "description": "Prestigious heritage collegiate palette with rich crimson, warm parchment and gold accents",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-01T10:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#8B1E28",
+      "primaryHover": "#6B141C",
+      "primaryLight": "#FBF0F1",
+      "secondary": "#B45309",
+      "accent": "#D97706"
+    },
+    "backgrounds": {
+      "background": "#FDFBF7",
+      "surface": "#FFFFFF",
+      "sidebar": "#5B1017",
+      "sidebarText": "#FFF7ED",
+      "sidebarMuted": "#E2B6B9",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#EFE9DF"
+    },
+    "typography": {
+      "textPrimary": "#261E1A",
+      "textSecondary": "#5C524B",
+      "textMuted": "#8C8178"
+    },
+    "borders": {
+      "border": "#EFE9DF",
+      "borderStrong": "#D9CFBF"
+    },
+    "semantic": {
+      "success": "#15803D",
+      "warning": "#B45309",
+      "danger": "#B91C1C",
+      "info": "#1D4ED8"
+    }
+  }
+}
+

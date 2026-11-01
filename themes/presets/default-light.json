@@ -1,0 +1,41 @@
+{
+  "id": "default-light",
+  "name": "Default Light",
+  "description": "Clean, neutral administrative ERP palette with modern indigo accents",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-01T10:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#2563EB",
+      "primaryHover": "#1D4ED8",
+      "primaryLight": "#EFF6FF",
+      "secondary": "#4F46E5",
+      "accent": "#06B6D4"
+    },
+    "backgrounds": {
+      "background": "#F8FAFC",
+      "surface": "#FFFFFF",
+      "sidebar": "#1E293B",
+      "sidebarText": "#F8FAFC",
+      "sidebarMuted": "#94A3B8",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#E2E8F0"
+    },
+    "typography": {
+      "textPrimary": "#0F172A",
+      "textSecondary": "#475569",
+      "textMuted": "#94A3B8"
+    },
+    "borders": {
+      "border": "#E2E8F0",
+      "borderStrong": "#CBD5E1"
+    },
+    "semantic": {
+      "success": "#16A34A",
+      "warning": "#EAB308",
+      "danger": "#DC2626",
+      "info": "#0284C7"
+    }
+  }
+}
+
