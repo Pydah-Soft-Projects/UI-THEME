@@ -91,13 +91,27 @@ jobs:
 
           cd "${PROJECT_DIR}"
 
-          echo "==> Pulling latest code from main..."
-          git fetch origin main
-          git checkout main
+          #################################################
+          # SAFE ZERO-CONFLICT CODE SYNC
+          #################################################
+          echo "==> Backing up live production themes..."
+          mkdir -p /tmp/theme-prod-backup
+          cp -f themes/active-theme.json /tmp/theme-prod-backup/ 2>/dev/null || true
+          cp -f themes/draft-theme.json /tmp/theme-prod-backup/ 2>/dev/null || true
+          [ -d themes/history ] && cp -rf themes/history /tmp/theme-prod-backup/ 2>/dev/null || true
 
-          # Protect server's active themes & history from merge conflicts
-          git checkout -- server/ scripts/ package.json package-lock.json 2>/dev/null || true
-          git pull origin main
+          echo "==> Pulling fresh code cleanly from origin/main (zero conflicts)..."
+          git fetch origin main
+          git checkout -B main origin/main
+          git reset --hard origin/main
+
+          echo "==> Restoring live production theme state..."
+          if [ -f /tmp/theme-prod-backup/active-theme.json ]; then
+            cp -f /tmp/theme-prod-backup/active-theme.json themes/active-theme.json
+            [ -f /tmp/theme-prod-backup/draft-theme.json ] && cp -f /tmp/theme-prod-backup/draft-theme.json themes/draft-theme.json || true
+            [ -d /tmp/theme-prod-backup/history ] && cp -rf /tmp/theme-prod-backup/history themes/ || true
+          fi
+          rm -rf /tmp/theme-prod-backup
 
           #################################################
           # BACKEND DEPENDENCIES & COMPILATION
