@@ -1,4 +1,4 @@
-name: Deploy Theme System to Production (theme.pydah.edu.in)
+name: Deploy Theme System to Production (ui-theme.pydah.edu.in)
 
 on:
   push:
@@ -86,7 +86,7 @@ jobs:
 
           echo "=========================================="
           echo "Starting Theme System Deployment"
-          echo "Domain: theme.pydah.edu.in"
+          echo "Domain: ui-theme.pydah.edu.in"
           echo "=========================================="
 
           cd "${PROJECT_DIR}"
@@ -155,7 +155,7 @@ jobs:
           rm -rf /tmp/theme-editor-dist
 
           echo "=========================================="
-          echo "Deployment to theme.pydah.edu.in completed successfully"
+          echo "Deployment to ui-theme.pydah.edu.in completed successfully"
           echo "=========================================="
 
           ENDSSH

@@ -313,7 +313,7 @@ Under your GitHub repository settings (**Settings > Secrets and variables > Acti
    - Deploys the frontend build to `/var/www/themes/frontend/`.
    - Deploys static theme assets to `/var/www/themes/public/`.
    - Reloads the PM2 process via `ecosystem.config.js` on port `7000`.
-3. **Nginx Reverse Proxy**: Uses `deployment/nginx.conf` for `theme.pydah.edu.in` to serve static distribution files directly and proxy `/api/` to port 7000.
+3. **Nginx Reverse Proxy**: Uses `deployment/nginx.conf` for `ui-theme.pydah.edu.in` to serve static distribution files directly and proxy `/api/` to port 7000.
 
 ---
 
