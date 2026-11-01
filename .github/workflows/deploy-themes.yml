@@ -80,7 +80,7 @@ jobs:
 
           set -e
 
-          PROJECT_DIR="/home/ec2-user/theme-suite"
+          PROJECT_DIR="/home/ec2-user/UI-THEME"
           FRONTEND_WEB_ROOT="/var/www/themes/frontend"
           STATIC_THEMES_ROOT="/var/www/themes/public"
 

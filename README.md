@@ -11,13 +11,13 @@ A centralized color management system and zero-downtime runtime distribution eng
 ```
                                   ┌────────────────────────┐
                                   │      Theme Editor      │
-                                  │ (React + Vite : 4001)  │
+                                  │ (React + Vite : 7001)  │
                                   └───────────┬────────────┘
                                               │ (REST API)
                                               ▼
 ┌───────────────────────────────────────────────────────────────────────────┐
 │                        Local Distribution Server                          │
-│                           (Node.js / Express : 4000)                      │
+│                           (Node.js / Express : 7000)                      │
 │                                                                           │
 │  themes/active-theme.json   ──────────►  scripts/generate-css.js          │
 │  themes/draft-theme.json                         │                        │
@@ -32,7 +32,7 @@ A centralized color management system and zero-downtime runtime distribution eng
             ▼                         ▼                         ▼
    ┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
    │ Student Portal  │       │ Faculty Portal  │       │ Accounts Portal │
-   │ (:4002 Sample)  │       │ (Connected App) │       │ (Connected App) │
+   │ (:7002 Sample)  │       │ (Connected App) │       │ (Connected App) │
    └─────────────────┘       └─────────────────┘       └─────────────────┘
 ```
 
@@ -118,21 +118,21 @@ npm run dev
 Or start them individually in separate terminals:
 
 ```bash
-# Terminal 1: Local Theme Distribution & API Server (Port 4000)
+# Terminal 1: Local Theme Distribution & API Server (Port 7000)
 npm run server
 
-# Terminal 2: Theme Editor Dashboard (Port 4001)
+# Terminal 2: Theme Editor Dashboard (Port 7001)
 npm run editor
 
-# Terminal 3: Sample Connected Portal (Port 4002)
+# Terminal 3: Sample Connected Portal (Port 7002)
 npm run portal
 ```
 
 ### 3. Open in Browser
-- **Theme Editor**: [http://localhost:4001](http://localhost:4001)
-- **Sample Connected Portal**: [http://localhost:4002](http://localhost:4002)
-- **Central CSS Distribution**: [http://localhost:4000/themes/theme.css](http://localhost:4000/themes/theme.css)
-- **Version Polling Target**: [http://localhost:4000/themes/version.json](http://localhost:4000/themes/version.json)
+- **Theme Editor**: [http://localhost:7001](http://localhost:7001)
+- **Sample Connected Portal**: [http://localhost:7002](http://localhost:7002)
+- **Central CSS Distribution**: [http://localhost:7000/themes/theme.css](http://localhost:7000/themes/theme.css)
+- **Version Polling Target**: [http://localhost:7000/themes/version.json](http://localhost:7000/themes/version.json)
 
 ### Presets Library (9 Institutional Palettes)
 The system includes 9 carefully crafted presets tailored for educational institutions:
@@ -150,7 +150,7 @@ The system includes 9 carefully crafted presets tailored for educational institu
 
 ## 4. How to Test Live Multi-Portal Updates
 
-1. Open [http://localhost:4001](http://localhost:4001) (Theme Editor) and [http://localhost:4002](http://localhost:4002) (Sample Portal) side-by-side in your browser.
+1. Open [http://localhost:7001](http://localhost:7001) (Theme Editor) and [http://localhost:7002](http://localhost:7002) (Sample Portal) side-by-side in your browser.
 2. In the **Theme Editor**, change the **Primary Brand** colour (e.g., from Forest Green `#145A3A` to Indigo `#2563EB` or pick from **Presets**).
 3. Notice the **Live Educational ERP Preview** immediately updates in the editor.
 4. Notice the **Sample Portal** has NOT changed yet (draft isolation).
@@ -171,8 +171,8 @@ Place this script in your portal's `index.html` `<head>`:
 ```html
 <!-- Runtime Theme Loader -->
 <script 
-  src="http://localhost:4000/themes/theme-loader.js" 
-  data-theme-server="http://localhost:4000"
+  src="http://localhost:7000/themes/theme-loader.js" 
+  data-theme-server="http://localhost:7000"
   data-poll-interval="30">
 </script>
 ```
@@ -312,8 +312,8 @@ Under your GitHub repository settings (**Settings > Secrets and variables > Acti
    - Compiles `theme.css`.
    - Deploys the frontend build to `/var/www/themes/frontend/`.
    - Deploys static theme assets to `/var/www/themes/public/`.
-   - Reloads the PM2 process via `ecosystem.config.js` on port `4000`.
-3. **Nginx Reverse Proxy**: Uses `deployment/nginx.conf` for `theme.pydah.edu.in` to serve static distribution files directly and proxy `/api/` to port 4000.
+   - Reloads the PM2 process via `ecosystem.config.js` on port `7000`.
+3. **Nginx Reverse Proxy**: Uses `deployment/nginx.conf` for `theme.pydah.edu.in` to serve static distribution files directly and proxy `/api/` to port 7000.
 
 ---
 
