@@ -148,6 +148,12 @@ jobs:
             /tmp/theme-editor-dist/ \
             "${FRONTEND_WEB_ROOT}/"
 
+          # Guarantee static themes are also available directly in frontend web root
+          # This ensures Nginx serves /themes/* with 200 OK regardless of which root Nginx is currently using
+          sudo mkdir -p "${FRONTEND_WEB_ROOT}/themes"
+          sudo cp -rf "${RUNTIME_DATA_DIR}/public/themes/"* "${FRONTEND_WEB_ROOT}/themes/" 2>/dev/null || true
+          sudo cp -rf "${RUNTIME_DATA_DIR}/public/"* "${FRONTEND_WEB_ROOT}/" 2>/dev/null || true
+
           # Ensure Nginx read permissions across web roots and runtime data
           sudo chmod -R 755 "${FRONTEND_WEB_ROOT}" "${RUNTIME_DATA_DIR}"
 
