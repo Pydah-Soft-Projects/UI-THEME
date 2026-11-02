@@ -108,9 +108,12 @@ jobs:
           #################################################
           cd "${PROJECT_DIR}"
           echo "==> Syncing application code cleanly from origin/main..."
+          # Discard local modifications to tracked files so checkout/reset never blocks
+          git reset --hard HEAD 2>/dev/null || true
           git fetch origin main
-          git checkout -B main origin/main
+          git checkout -f main 2>/dev/null || git checkout -B main origin/main
           git reset --hard origin/main
+          git clean -fd
 
           #################################################
           # 3. BACKEND DEPENDENCIES & COMPILATION
