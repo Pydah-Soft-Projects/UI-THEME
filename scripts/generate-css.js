@@ -235,26 +235,18 @@ function generateCSSFromTheme(theme) {
 }
 
 /**
- * Builds CSS file from active theme and saves to public/themes/theme.css
+ * Builds CSS file from active theme and saves to both /public/ and /public/themes/
  */
 function buildCSS(themeFilePath, outputFilePath) {
   const dataDir = process.env.THEME_DATA_DIR;
+  const rootDir = path.join(__dirname, '..');
   
   let resolvedThemePath = themeFilePath;
   if (!resolvedThemePath) {
     if (dataDir && fs.existsSync(path.join(dataDir, 'themes', 'active-theme.json'))) {
       resolvedThemePath = path.join(dataDir, 'themes', 'active-theme.json');
     } else {
-      resolvedThemePath = path.join(__dirname, '..', 'themes', 'active-theme.json');
-    }
-  }
-
-  let resolvedOutputPath = outputFilePath;
-  if (!resolvedOutputPath) {
-    if (dataDir) {
-      resolvedOutputPath = path.join(dataDir, 'public', 'theme.css');
-    } else {
-      resolvedOutputPath = path.join(__dirname, '..', 'public', 'themes', 'theme.css');
+      resolvedThemePath = path.join(rootDir, 'themes', 'active-theme.json');
     }
   }
 
@@ -266,32 +258,83 @@ function buildCSS(themeFilePath, outputFilePath) {
   const theme = JSON.parse(raw);
   const css = generateCSSFromTheme(theme);
 
-  const outDir = path.dirname(resolvedOutputPath);
-  if (!fs.existsSync(outDir)) {
-    fs.mkdirSync(outDir, { recursive: true });
+  // Target base directory
+  const basePublicDir = dataDir 
+    ? path.join(dataDir, 'public') 
+    : path.join(rootDir, 'public');
+
+  // Primary output paths: both /public/themes/theme.css and /public/theme.css
+  const themesDir = path.join(basePublicDir, 'themes');
+  const primaryCssPath = path.join(themesDir, 'theme.css');
+  const rootCssPath = path.join(basePublicDir, 'theme.css');
+
+  // Ensure directories exist
+  if (!fs.existsSync(basePublicDir)) fs.mkdirSync(basePublicDir, { recursive: true });
+  if (!fs.existsSync(themesDir)) fs.mkdirSync(themesDir, { recursive: true });
+
+  // Atomic write helper
+  function atomicWrite(targetPath, content) {
+    const dir = path.dirname(targetPath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    const tempPath = `${targetPath}.${Date.now()}.${Math.random().toString(36).substring(7)}.tmp`;
+    fs.writeFileSync(tempPath, content, 'utf8');
+    fs.renameSync(tempPath, targetPath);
   }
 
-  // Atomic file write to avoid partial reads by web clients
-  const tempPath = `${resolvedOutputPath}.${Date.now()}.${Math.random().toString(36).substring(7)}.tmp`;
-  fs.writeFileSync(tempPath, css, 'utf8');
-  fs.renameSync(tempPath, resolvedOutputPath);
-
-  // If writing to a public dir, also ensure secondary /themes/ or root path is updated
-  if (resolvedOutputPath.endsWith('theme.css')) {
-    const parentDir = path.dirname(resolvedOutputPath);
-    const subThemesDir = path.join(parentDir, 'themes');
-    if (parentDir.endsWith('themes')) {
-      // Also update root theme.css
-      const rootThemeCss = path.join(parentDir, '..', 'theme.css');
-      try { fs.copyFileSync(resolvedOutputPath, rootThemeCss); } catch (e) {}
-    } else {
-      // Also update /themes/theme.css
-      if (!fs.existsSync(subThemesDir)) fs.mkdirSync(subThemesDir, { recursive: true });
-      try { fs.copyFileSync(resolvedOutputPath, path.join(subThemesDir, 'theme.css')); } catch (e) {}
-    }
+  // If a specific output path was requested, write to it
+  if (outputFilePath) {
+    atomicWrite(outputFilePath, css);
   }
 
-  console.log(`[Theme Engine] CSS compiled successfully to: ${resolvedOutputPath}`);
+  // Always write to BOTH /public/themes/theme.css and /public/theme.css
+  atomicWrite(primaryCssPath, css);
+  atomicWrite(rootCssPath, css);
+
+  // Also ensure theme-loader.js and version.json are mirrored in both locations if available
+  const srcLoader = path.join(rootDir, 'public', 'themes', 'theme-loader.js');
+  const fallbackLoader = path.join(rootDir, 'public', 'theme-loader.js');
+  const validSrcLoader = fs.existsSync(srcLoader) ? srcLoader : (fs.existsSync(fallbackLoader) ? fallbackLoader : null);
+
+  if (validSrcLoader) {
+    const targetThemesLoader = path.join(themesDir, 'theme-loader.js');
+    const targetRootLoader = path.join(basePublicDir, 'theme-loader.js');
+    try {
+      if (!fs.existsSync(targetThemesLoader) || fs.statSync(validSrcLoader).mtimeMs > (fs.statSync(targetThemesLoader).mtimeMs || 0)) {
+        fs.copyFileSync(validSrcLoader, targetThemesLoader);
+      }
+      if (!fs.existsSync(targetRootLoader) || fs.statSync(validSrcLoader).mtimeMs > (fs.statSync(targetRootLoader).mtimeMs || 0)) {
+        fs.copyFileSync(validSrcLoader, targetRootLoader);
+      }
+    } catch (e) {}
+  }
+
+  // Mirror version.json if present
+  const srcVersion = path.join(rootDir, 'public', 'themes', 'version.json');
+  const dataVersion = path.join(basePublicDir, 'themes', 'version.json');
+  const activeVerSource = fs.existsSync(dataVersion) ? dataVersion : (fs.existsSync(srcVersion) ? srcVersion : null);
+
+  if (activeVerSource) {
+    try {
+      const verContent = fs.readFileSync(activeVerSource, 'utf8');
+      atomicWrite(path.join(themesDir, 'version.json'), verContent);
+      atomicWrite(path.join(basePublicDir, 'version.json'), verContent);
+    } catch (e) {}
+  } else {
+    // Generate fresh version.json
+    const verData = JSON.stringify({
+      version: theme.version || '1.0.0',
+      themeId: theme.id || 'active-theme',
+      themeName: theme.name || 'Default Theme',
+      lastPublished: theme.lastPublished || new Date().toISOString(),
+      timestamp: Date.now()
+    }, null, 2);
+    atomicWrite(path.join(themesDir, 'version.json'), verData);
+    atomicWrite(path.join(basePublicDir, 'version.json'), verData);
+  }
+
+  console.log(`[Theme Engine] CSS compiled successfully to:`);
+  console.log(`  - ${primaryCssPath}`);
+  console.log(`  - ${rootCssPath}`);
   return css;
 }
 
