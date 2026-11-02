@@ -9,7 +9,8 @@ module.exports = {
       max_memory_restart: '300M',
       env: {
         NODE_ENV: 'production',
-        PORT: 7000
+        PORT: 7000,
+        THEME_DATA_DIR: '/var/lib/ui-theme'
       }
     }
   ]

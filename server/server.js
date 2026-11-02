@@ -13,21 +13,6 @@ const { generateCSSFromTheme, buildCSS } = require('../scripts/generate-css');
 const app = express();
 const PORT = process.env.PORT || 7000;
 
-// Directories
-const ROOT_DIR = path.join(__dirname, '..');
-const THEMES_DIR = path.join(ROOT_DIR, 'themes');
-const PRESETS_DIR = path.join(THEMES_DIR, 'presets');
-const HISTORY_DIR = path.join(THEMES_DIR, 'history');
-const PUBLIC_DIR = path.join(ROOT_DIR, 'public');
-const PUBLIC_THEMES_DIR = path.join(PUBLIC_DIR, 'themes');
-
-// Ensure necessary directories exist
-[THEMES_DIR, PRESETS_DIR, HISTORY_DIR, PUBLIC_DIR, PUBLIC_THEMES_DIR].forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-});
-
 // Middleware
 app.use(cors({
   origin: '*',
@@ -36,7 +21,26 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '2mb' }));
 
-// Helper functions
+// Directories
+// Application directory (managed by GitHub - code & templates)
+const ROOT_DIR = path.join(__dirname, '..');
+const APP_THEMES_DIR = path.join(ROOT_DIR, 'themes');
+const PRESETS_DIR = path.join(APP_THEMES_DIR, 'presets');
+const APP_PUBLIC_DIR = path.join(ROOT_DIR, 'public');
+
+// Runtime data directory (managed by Theme Editor - persistent state)
+// Configurable via THEME_DATA_DIR (e.g. /var/lib/ui-theme on production)
+const DATA_DIR = process.env.THEME_DATA_DIR
+  ? path.resolve(process.env.THEME_DATA_DIR)
+  : ROOT_DIR;
+
+const THEMES_DIR = process.env.THEME_DATA_DIR ? path.join(DATA_DIR, 'themes') : path.join(ROOT_DIR, 'themes');
+const HISTORY_DIR = path.join(THEMES_DIR, 'history');
+const BACKUPS_DIR = path.join(DATA_DIR, 'backups');
+const PUBLIC_DIR = process.env.THEME_DATA_DIR ? path.join(DATA_DIR, 'public') : path.join(ROOT_DIR, 'public');
+const PUBLIC_THEMES_DIR = path.join(PUBLIC_DIR, 'themes');
+
+// Helper functions for reading & atomic writing
 const ACTIVE_FILE = path.join(THEMES_DIR, 'active-theme.json');
 const DRAFT_FILE = path.join(THEMES_DIR, 'draft-theme.json');
 const VERSION_FILE = path.join(PUBLIC_THEMES_DIR, 'version.json');
@@ -54,9 +58,75 @@ function readJsonFile(filePath, fallback = {}) {
   return fallback;
 }
 
+/**
+ * Atomic file writer using write-then-rename to ensure zero partial reads by clients
+ */
 function writeJsonFile(filePath, data) {
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+  const dir = path.dirname(filePath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  const tempPath = `${filePath}.${Date.now()}.${Math.random().toString(36).substring(7)}.tmp`;
+  fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf8');
+  fs.renameSync(tempPath, filePath);
 }
+
+// Initialise and seed runtime data directory if needed
+function initializeDataDirectory() {
+  [THEMES_DIR, HISTORY_DIR, BACKUPS_DIR, PUBLIC_DIR, PUBLIC_THEMES_DIR].forEach(dir => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  });
+
+  // Seed active-theme.json from app template if not present in runtime data dir
+  if (!fs.existsSync(ACTIVE_FILE)) {
+    const seedActive = path.join(APP_THEMES_DIR, 'active-theme.json');
+    if (fs.existsSync(seedActive)) {
+      console.log(`[Theme Server] Seeding active-theme.json into runtime data directory...`);
+      fs.copyFileSync(seedActive, ACTIVE_FILE);
+    }
+  }
+
+  // Seed draft-theme.json
+  if (!fs.existsSync(DRAFT_FILE)) {
+    const seedDraft = path.join(APP_THEMES_DIR, 'draft-theme.json');
+    if (fs.existsSync(seedDraft)) {
+      fs.copyFileSync(seedDraft, DRAFT_FILE);
+    } else if (fs.existsSync(ACTIVE_FILE)) {
+      fs.copyFileSync(ACTIVE_FILE, DRAFT_FILE);
+    }
+  }
+
+  // Copy theme-loader.js SDK into runtime public directory
+  const seedLoader = path.join(APP_PUBLIC_DIR, 'theme-loader.js');
+  const targetLoader = path.join(PUBLIC_DIR, 'theme-loader.js');
+  const targetThemesLoader = path.join(PUBLIC_THEMES_DIR, 'theme-loader.js');
+  if (fs.existsSync(seedLoader)) {
+    try {
+      if (!fs.existsSync(targetLoader) || fs.statSync(seedLoader).mtimeMs > (fs.statSync(targetLoader).mtimeMs || 0)) {
+        fs.copyFileSync(seedLoader, targetLoader);
+      }
+      if (!fs.existsSync(targetThemesLoader) || fs.statSync(seedLoader).mtimeMs > (fs.statSync(targetThemesLoader).mtimeMs || 0)) {
+        fs.copyFileSync(seedLoader, targetThemesLoader);
+      }
+    } catch (e) {
+      console.warn(`[Theme Server] Warning copying theme-loader.js:`, e.message);
+    }
+  }
+
+  // Generate initial CSS if missing
+  if (!fs.existsSync(CSS_FILE) && fs.existsSync(ACTIVE_FILE)) {
+    try {
+      console.log(`[Theme Server] Compiling initial CSS in runtime public directory...`);
+      buildCSS(ACTIVE_FILE, CSS_FILE);
+    } catch (e) {
+      console.warn(`[Theme Server] Warning generating initial CSS:`, e.message);
+    }
+  }
+}
+
+initializeDataDirectory();
 
 function incrementSemver(ver) {
   if (!ver || typeof ver !== 'string') return '1.0.1';
@@ -412,6 +482,9 @@ app.get(['/themes/theme-loader.js', '/theme-loader.js'], (req, res) => {
 
 // Serve everything else from public folder statically
 app.use(express.static(PUBLIC_DIR));
+if (PUBLIC_DIR !== APP_PUBLIC_DIR) {
+  app.use(express.static(APP_PUBLIC_DIR));
+}
 
 // Process crash resilience guards
 process.on('uncaughtException', (err) => {
@@ -427,6 +500,7 @@ function startServer(port = PORT) {
   const srv = app.listen(port, '0.0.0.0', () => {
     console.log(`====================================================`);
     console.log(`Centralized Theme Server is running on port ${port}`);
+    console.log(`Runtime Data Directory: ${DATA_DIR}`);
     console.log(`Theme CSS Distribution: http://localhost:${port}/themes/theme.css`);
     console.log(`Version Endpoint:       http://localhost:${port}/themes/version.json`);
     console.log(`Theme Loader Script:    http://localhost:${port}/themes/theme-loader.js`);

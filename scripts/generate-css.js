@@ -238,8 +238,25 @@ function generateCSSFromTheme(theme) {
  * Builds CSS file from active theme and saves to public/themes/theme.css
  */
 function buildCSS(themeFilePath, outputFilePath) {
-  const resolvedThemePath = themeFilePath || path.join(__dirname, '..', 'themes', 'active-theme.json');
-  const resolvedOutputPath = outputFilePath || path.join(__dirname, '..', 'public', 'themes', 'theme.css');
+  const dataDir = process.env.THEME_DATA_DIR;
+  
+  let resolvedThemePath = themeFilePath;
+  if (!resolvedThemePath) {
+    if (dataDir && fs.existsSync(path.join(dataDir, 'themes', 'active-theme.json'))) {
+      resolvedThemePath = path.join(dataDir, 'themes', 'active-theme.json');
+    } else {
+      resolvedThemePath = path.join(__dirname, '..', 'themes', 'active-theme.json');
+    }
+  }
+
+  let resolvedOutputPath = outputFilePath;
+  if (!resolvedOutputPath) {
+    if (dataDir) {
+      resolvedOutputPath = path.join(dataDir, 'public', 'theme.css');
+    } else {
+      resolvedOutputPath = path.join(__dirname, '..', 'public', 'themes', 'theme.css');
+    }
+  }
 
   if (!fs.existsSync(resolvedThemePath)) {
     throw new Error(`Theme file does not exist at ${resolvedThemePath}`);
@@ -254,7 +271,26 @@ function buildCSS(themeFilePath, outputFilePath) {
     fs.mkdirSync(outDir, { recursive: true });
   }
 
-  fs.writeFileSync(resolvedOutputPath, css, 'utf8');
+  // Atomic file write to avoid partial reads by web clients
+  const tempPath = `${resolvedOutputPath}.${Date.now()}.${Math.random().toString(36).substring(7)}.tmp`;
+  fs.writeFileSync(tempPath, css, 'utf8');
+  fs.renameSync(tempPath, resolvedOutputPath);
+
+  // If writing to a public dir, also ensure secondary /themes/ or root path is updated
+  if (resolvedOutputPath.endsWith('theme.css')) {
+    const parentDir = path.dirname(resolvedOutputPath);
+    const subThemesDir = path.join(parentDir, 'themes');
+    if (parentDir.endsWith('themes')) {
+      // Also update root theme.css
+      const rootThemeCss = path.join(parentDir, '..', 'theme.css');
+      try { fs.copyFileSync(resolvedOutputPath, rootThemeCss); } catch (e) {}
+    } else {
+      // Also update /themes/theme.css
+      if (!fs.existsSync(subThemesDir)) fs.mkdirSync(subThemesDir, { recursive: true });
+      try { fs.copyFileSync(resolvedOutputPath, path.join(subThemesDir, 'theme.css')); } catch (e) {}
+    }
+  }
+
   console.log(`[Theme Engine] CSS compiled successfully to: ${resolvedOutputPath}`);
   return css;
 }

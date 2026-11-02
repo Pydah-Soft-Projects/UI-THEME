@@ -1,7 +1,8 @@
 {
-  "version": "1.0.8",
-  "themeId": "active-theme",
-  "themeName": "Teal & Sage Polytechnic (Draft)",
-  "lastPublished": "2026-11-01T12:38:58.602Z",
-  "timestamp": 1793536738604
+  "version": "1.0.2",
+  "themeId": "forest-green-light",
+  "themeName": "Forest Green Light",
+  "lastPublished": "2026-11-02T03:54:31.011Z",
+  "timestamp": 1793591671017,
+  "rollbackSource": "active-theme-v1.0.0-1793591670974.json"
 }

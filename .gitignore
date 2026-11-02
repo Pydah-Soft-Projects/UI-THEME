@@ -8,6 +8,13 @@ dist/
 dist-ssr/
 *.local
 
+# Runtime Data & Backups (Persistent state outside git)
+data/
+test_data_dir/
+themes/history/
+*.tmp
+.npm-ci-lockhash
+
 # Environment variables
 .env
 .env.local

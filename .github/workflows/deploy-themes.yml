@@ -82,25 +82,38 @@ jobs:
 
           PROJECT_DIR="/home/ec2-user/UI-THEME"
           FRONTEND_WEB_ROOT="/var/www/themes/frontend"
-          STATIC_THEMES_ROOT="/var/www/themes/public"
+          RUNTIME_DATA_DIR="/var/lib/ui-theme"
 
           echo "=========================================="
           echo "Starting Theme System Deployment"
           echo "Domain: ui-theme.pydah.edu.in"
           echo "=========================================="
 
-          cd "${PROJECT_DIR}"
+          #################################################
+          # 1. RUNTIME DATA DIRECTORY SETUP (/var/lib/ui-theme)
+          #################################################
+          echo "==> Ensuring runtime data directory exists..."
+          sudo mkdir -p "${RUNTIME_DATA_DIR}/themes/history" "${RUNTIME_DATA_DIR}/public/themes" "${RUNTIME_DATA_DIR}/backups"
+          sudo chown -R ec2-user:ec2-user "${RUNTIME_DATA_DIR}"
 
-          echo "==> Pulling latest code from main..."
-          git fetch origin main
-          git checkout main
-
-          # Protect server's active themes & history from merge conflicts
-          git checkout -- server/ scripts/ package.json package-lock.json 2>/dev/null || true
-          git pull origin main
+          # Migrate existing live theme if data dir is fresh
+          if [ ! -f "${RUNTIME_DATA_DIR}/themes/active-theme.json" ] && [ -f "${PROJECT_DIR}/themes/active-theme.json" ]; then
+            echo "==> Migrating existing live theme to runtime data directory..."
+            cp -r "${PROJECT_DIR}/themes/"* "${RUNTIME_DATA_DIR}/themes/" 2>/dev/null || true
+            cp -r "${PROJECT_DIR}/public/"* "${RUNTIME_DATA_DIR}/public/" 2>/dev/null || true
+          fi
 
           #################################################
-          # BACKEND DEPENDENCIES & COMPILATION
+          # 2. APPLICATION CODE SYNC (Zero-Conflict)
+          #################################################
+          cd "${PROJECT_DIR}"
+          echo "==> Syncing application code cleanly from origin/main..."
+          git fetch origin main
+          git checkout -B main origin/main
+          git reset --hard origin/main
+
+          #################################################
+          # 3. BACKEND DEPENDENCIES & COMPILATION
           #################################################
           echo "==> Checking backend dependencies..."
           LOCK_HASH_FILE="${PROJECT_DIR}/.npm-ci-lockhash"
@@ -119,34 +132,24 @@ jobs:
             echo "==> Backend dependencies unchanged, skipping npm install"
           fi
 
-          # Ensure theme.css is compiled on server from active-theme.json
-          node scripts/generate-css.js
+          # Ensure runtime CSS is compiled in the data directory
+          THEME_DATA_DIR="${RUNTIME_DATA_DIR}" node scripts/generate-css.js
 
           #################################################
-          # DEPLOY STATIC ASSETS FOR NGINX
+          # 4. DEPLOY FRONTEND SPA FOR NGINX
           #################################################
-          echo "==> Deploying Theme Editor & Static Distribution..."
+          echo "==> Deploying Theme Editor frontend..."
           sudo mkdir -p "${FRONTEND_WEB_ROOT}"
-          sudo mkdir -p "${STATIC_THEMES_ROOT}"
 
-          # Deploy Theme Editor frontend SPA
           sudo rsync -av --delete \
             /tmp/theme-editor-dist/ \
             "${FRONTEND_WEB_ROOT}/"
 
-          # Deploy public distribution files (theme.css, theme-loader.js, version.json)
-          sudo rsync -av \
-            "${PROJECT_DIR}/public/" \
-            "${STATIC_THEMES_ROOT}/"
-
-          # Mirror themes into frontend root as well so both /var/www/themes/public
-          # and /var/www/themes/frontend can serve /themes/* seamlessly without 404
-          sudo mkdir -p "${FRONTEND_WEB_ROOT}/themes"
-          sudo cp -r "${PROJECT_DIR}/public/themes/"* "${FRONTEND_WEB_ROOT}/themes/" 2>/dev/null || true
-          sudo cp -r "${PROJECT_DIR}/public/"* "${FRONTEND_WEB_ROOT}/" 2>/dev/null || true
+          # Ensure Nginx read permissions across web roots and runtime data
+          sudo chmod -R 755 "${FRONTEND_WEB_ROOT}" "${RUNTIME_DATA_DIR}"
 
           #################################################
-          # PM2 (BACKEND PROCESS ON PORT 7000)
+          # 5. PM2 (BACKEND PROCESS ON PORT 7000)
           #################################################
           echo "==> Reloading PM2 process via ecosystem.config.js..."
           cd "${PROJECT_DIR}"
