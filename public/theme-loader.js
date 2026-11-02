@@ -433,6 +433,30 @@
     setServer: function (url) {
       state.themeServer = url;
       checkAndSyncTheme(true);
+    },
+    getToken: function (tokenName) {
+      if (typeof window === 'undefined' || typeof document === 'undefined') return '';
+      var varName = tokenName.indexOf('--') === 0 ? tokenName : '--' + tokenName;
+      return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    },
+    getTokens: function () {
+      if (typeof window === 'undefined' || typeof document === 'undefined') return {};
+      var style = getComputedStyle(document.documentElement);
+      var tokens = [
+        'primary', 'primary-hover', 'primary-light', 'primary-rgb',
+        'secondary', 'secondary-rgb', 'accent',
+        'background', 'surface', 'sidebar', 'sidebar-text', 'sidebar-muted',
+        'navbar', 'navbar-border',
+        'text-primary', 'text-secondary', 'text-muted',
+        'border', 'border-strong',
+        'success', 'warning', 'danger', 'info'
+      ];
+      var result = {};
+      for (var i = 0; i < tokens.length; i++) {
+        var t = tokens[i];
+        result[t] = style.getPropertyValue('--' + t).trim();
+      }
+      return result;
     }
   };
 });
