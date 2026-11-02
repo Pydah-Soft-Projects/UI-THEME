@@ -1,40 +1,40 @@
 {
-  "id": "forest-green-light",
-  "name": "Forest Green Light",
+  "id": "draft-theme",
+  "name": "Teal & Sage Polytechnic (Draft)",
   "description": "Institutional theme with deep forest green brand accents",
-  "version": "1.0.2",
-  "lastPublished": "2026-11-01T11:53:43.504Z",
+  "version": "1.0.8",
+  "lastPublished": "2026-11-01T12:38:58.602Z",
   "colors": {
     "brand": {
-      "primary": "#145A3A",
-      "primaryHover": "#10452E",
-      "primaryLight": "#E5F2E9",
-      "secondary": "#287A50",
-      "accent": "#0E8388"
+      "primary": "#0D5C75",
+      "primaryHover": "#084152",
+      "primaryLight": "#E6F4F8",
+      "secondary": "#2A9D8F",
+      "accent": "#E76F51"
     },
     "backgrounds": {
-      "background": "#F7F9F7",
+      "background": "#F4F9FA",
       "surface": "#FFFFFF",
-      "sidebar": "#145A3A",
+      "sidebar": "#084152",
       "sidebarText": "#FFFFFF",
-      "sidebarMuted": "#A1CBB7",
+      "sidebarMuted": "#99CBD9",
       "navbar": "#FFFFFF",
-      "navbarBorder": "#E5EAE6"
+      "navbarBorder": "#D9E9ED"
     },
     "typography": {
-      "textPrimary": "#252B27",
-      "textSecondary": "#5B645E",
-      "textMuted": "#8D9790"
+      "textPrimary": "#17292F",
+      "textSecondary": "#47616A",
+      "textMuted": "#7D98A1"
     },
     "borders": {
-      "border": "#E5EAE6",
-      "borderStrong": "#CBD5CE"
+      "border": "#D9E9ED",
+      "borderStrong": "#BDD6DC"
     },
     "semantic": {
-      "success": "#198754",
-      "warning": "#F0AD4E",
-      "danger": "#DC3545",
-      "info": "#0D6EFD"
+      "success": "#2A9D8F",
+      "warning": "#E9C46A",
+      "danger": "#E76F51",
+      "info": "#264653"
     }
   }
 }
