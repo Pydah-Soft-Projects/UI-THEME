@@ -272,8 +272,7 @@
 
     var xhr = new XMLHttpRequest();
     xhr.open('GET', versionUrl, true);
-    xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    xhr.setRequestHeader('Pragma', 'no-cache');
+    // Keep as CORS Simple Request
     xhr.timeout = timeoutMs || 2500;
 
     xhr.onload = function () {
