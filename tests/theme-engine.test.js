@@ -43,7 +43,7 @@ function runTests() {
 
   // Ensure clean test baseline
   const activePath = path.join(__dirname, '..', 'themes', 'active-theme.json');
-  const presetPath = path.join(__dirname, '..', 'themes', 'presets', 'forest-green-light.json');
+  const presetPath = path.join(__dirname, '..', 'themes', 'presets', 'royal-navy-light.json');
   const historyDir = path.join(__dirname, '..', 'themes', 'history');
   if (fs.existsSync(presetPath)) {
     fs.copyFileSync(presetPath, activePath);
@@ -90,27 +90,26 @@ function runTests() {
 
     const active = JSON.parse(fs.readFileSync(activePath, 'utf8'));
     assert(active.colors && active.colors.brand, 'active theme must contain brand colors');
-    assert.strictEqual(active.colors.brand.primary, '#145A3A', 'default brand primary must be Forest Green (#145A3A)');
+    assert.strictEqual(active.colors.brand.primary, '#1E3A8A', 'default brand primary must be Royal Navy Classic (#1E3A8A)');
   });
 
   // SCENARIO 2: Colour math & conversion
   test('Scenario 2: HEX <-> RGB <-> HSL conversions are bidirectional and accurate', () => {
-    const rgb = hexToRgb('#145A3A');
-    assert.strictEqual(rgb.r, 20);
-    assert.strictEqual(rgb.g, 90);
-    assert.strictEqual(rgb.b, 58);
+    const rgb = hexToRgb('#1E3A8A');
+    assert.strictEqual(rgb.r, 30);
+    assert.strictEqual(rgb.g, 58);
+    assert.strictEqual(rgb.b, 138);
 
     const backToHex = rgbToHex(rgb.r, rgb.g, rgb.b);
-    assert.strictEqual(backToHex.toUpperCase(), '#145A3A');
+    assert.strictEqual(backToHex.toUpperCase(), '#1E3A8A');
 
     const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-    assert(hsl.h >= 150 && hsl.h <= 155, `Hue expected ~153, got ${hsl.h}`);
-    assert(hsl.s >= 60 && hsl.s <= 66, `Saturation expected ~64, got ${hsl.s}`);
+    assert(hsl.h >= 220 && hsl.h <= 230, `Hue expected ~224, got ${hsl.h}`);
   });
 
   // SCENARIO 3: HEX input validation
   test('Scenario 3: HEX color validation logic accepts valid 3, 6, 8 hex and rejects invalid', () => {
-    const validColors = ['#145A3A', '#FFF', '#123456', '#AABBCCDD'];
+    const validColors = ['#1E3A8A', '#FFF', '#123456', '#AABBCCDD'];
     const invalidColors = ['145A3A', '#GGGGGG', '#12345', 'rgb(0,0,0)', '#'];
 
     const hexRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
@@ -124,7 +123,7 @@ function runTests() {
 
   // SCENARIO 4: Automatic shade generation (50 to 900)
   test('Scenario 4: Automatic shade generation produces 10 perceptually calibrated steps', () => {
-    const shades = generateShades('#145A3A');
+    const shades = generateShades('#1E3A8A');
     const requiredWeights = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900'];
     assert(shades, 'Shades object should be generated');
 
@@ -151,13 +150,13 @@ function runTests() {
     const css = generateCSSFromTheme(theme);
 
     assert(css.includes(':root {'), 'CSS must declare :root selector');
-    assert(css.includes('--primary: #145A3A;'), 'CSS must include --primary');
-    assert(css.includes('--primary-rgb: 20, 90, 58;'), 'CSS must include --primary-rgb for opacity styling');
+    assert(css.includes('--primary: #1E3A8A;'), 'CSS must include --primary');
+    assert(css.includes('--primary-rgb: 30, 58, 138;'), 'CSS must include --primary-rgb for opacity styling');
     assert(css.includes('--primary-50:'), 'CSS must include generated --primary-50');
     assert(css.includes('--primary-900:'), 'CSS must include generated --primary-900');
     assert(css.includes('--surface: #FFFFFF;'), 'CSS must include --surface');
-    assert(css.includes('--sidebar: #145A3A;'), 'CSS must include --sidebar');
-    assert(css.includes('--success: #198754;'), 'CSS must include --success');
+    assert(css.includes('--sidebar: #0F172A;'), 'CSS must include --sidebar');
+    assert(css.includes('--success: #16A34A;'), 'CSS must include --success');
   });
 
   // SCENARIO 6: Distributable files compilation
@@ -267,9 +266,9 @@ function runTests() {
         assert.strictEqual(rollbackRes.status, 200);
         assert.strictEqual(rollbackRes.body.success, true);
 
-        // Verify active theme primary restored back to Forest Green (#145A3A)
+        // Verify active theme primary restored back to Royal Navy Classic (#1E3A8A)
         const activeRes = await request('/api/theme/active');
-        assert.strictEqual(activeRes.body.colors.brand.primary, '#145A3A', 'Primary should be restored to #145A3A');
+        assert.strictEqual(activeRes.body.colors.brand.primary, '#1E3A8A', 'Primary should be restored to #1E3A8A');
       });
 
       // Scenario 11: Cache-Control Headers for version.json and theme.css

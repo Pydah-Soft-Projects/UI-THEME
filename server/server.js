@@ -194,7 +194,7 @@ app.get('/api/theme/status', (req, res) => {
     lastPublished: versionData.lastPublished || active.lastPublished || null,
     activeTheme: {
       id: active.id || 'active-theme',
-      name: active.name || 'Forest Green Light',
+      name: active.name || 'Royal Navy Classic',
       description: active.description
     },
     draftTheme: {
