@@ -1,0 +1,40 @@
+{
+  "id": "terracotta-cream-light",
+  "name": "Terracotta & Cream",
+  "description": "A warm, welcoming campus theme with earthy terracotta and soft cream surfaces",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-03T00:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#B4533C",
+      "primaryHover": "#923F2D",
+      "primaryLight": "#FCEEE9",
+      "secondary": "#D17A4A",
+      "accent": "#A88632"
+    },
+    "backgrounds": {
+      "background": "#FBF8F4",
+      "surface": "#FFFFFF",
+      "sidebar": "#59352C",
+      "sidebarText": "#FFF9F2",
+      "sidebarMuted": "#D9B6A8",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#EEE3D9"
+    },
+    "typography": {
+      "textPrimary": "#30231E",
+      "textSecondary": "#66534A",
+      "textMuted": "#948176"
+    },
+    "borders": {
+      "border": "#EEE3D9",
+      "borderStrong": "#DCCABB"
+    },
+    "semantic": {
+      "success": "#41805A",
+      "warning": "#BD7B24",
+      "danger": "#B9433D",
+      "info": "#397A9B"
+    }
+  }
+}

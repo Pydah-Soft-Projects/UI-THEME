@@ -1,0 +1,40 @@
+{
+  "id": "forest-lime-light",
+  "name": "Forest & Lime",
+  "description": "A grounded green palette with deep forest branding and fresh lime highlights",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-03T00:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#28734A",
+      "primaryHover": "#1D5A39",
+      "primaryLight": "#EAF5EE",
+      "secondary": "#4D9A61",
+      "accent": "#8AAB35"
+    },
+    "backgrounds": {
+      "background": "#F5F9F5",
+      "surface": "#FFFFFF",
+      "sidebar": "#1E3D2B",
+      "sidebarText": "#F5FAF6",
+      "sidebarMuted": "#A9C8B2",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#DFEAE1"
+    },
+    "typography": {
+      "textPrimary": "#1F3024",
+      "textSecondary": "#506456",
+      "textMuted": "#809285"
+    },
+    "borders": {
+      "border": "#DFEAE1",
+      "borderStrong": "#C4D8C8"
+    },
+    "semantic": {
+      "success": "#287A4C",
+      "warning": "#B77D22",
+      "danger": "#BD4747",
+      "info": "#2879A2"
+    }
+  }
+}

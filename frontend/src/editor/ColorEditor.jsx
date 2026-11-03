@@ -3,18 +3,59 @@ import ColorPickerField from './ColorPickerField';
 import ShadeGenerator from './ShadeGenerator';
 import { Palette, Layout, Type, Square, AlertCircle } from 'lucide-react';
 
+export const EDITOR_SECTIONS = [
+  {
+    id: 'brand',
+    label: 'Brand & Accents',
+    title: 'Brand & accents',
+    description: 'Set the primary, hover, light, secondary, and accent colors used throughout your theme.',
+    icon: Palette,
+    count: 5
+  },
+  {
+    id: 'backgrounds',
+    label: 'Surfaces & Layout',
+    title: 'Surfaces & layout',
+    description: 'Choose the colors for application backgrounds, surfaces, sidebars, and navigation.',
+    icon: Layout,
+    count: 4
+  },
+  {
+    id: 'typography',
+    label: 'Typography',
+    title: 'Typography',
+    description: 'Tune primary, secondary, and muted text colors for clear, readable content.',
+    icon: Type,
+    count: 3
+  },
+  {
+    id: 'borders',
+    label: 'Borders & Outlines',
+    title: 'Borders & outlines',
+    description: 'Adjust default and strong outlines used to separate interface elements.',
+    icon: Square,
+    count: 2
+  },
+  {
+    id: 'semantic',
+    label: 'Semantic States',
+    title: 'Semantic states',
+    description: 'Set the colors used for success, warning, danger, and informational states.',
+    icon: AlertCircle,
+    count: 4
+  }
+];
+
 export default function ColorEditor({
   theme,
   defaultTheme,
   onChangeColor,
-  onBatchUpdate
+  activeTab
 }) {
   const [selectedBaseForShades, setSelectedBaseForShades] = useState({
     hex: theme?.colors?.brand?.primary || '#145A3A',
     label: 'Primary Brand'
   });
-  const [activeTab, setActiveTab] = useState('brand');
-
   const colors = theme?.colors || {};
   const defaultColors = defaultTheme?.colors || {};
 
@@ -26,14 +67,6 @@ export default function ColorEditor({
     }
   };
 
-  const tabs = [
-    { id: 'brand', label: 'Brand & Accents', icon: Palette, count: 5 },
-    { id: 'backgrounds', label: 'Surfaces & Layout', icon: Layout, count: 4 },
-    { id: 'typography', label: 'Typography', icon: Type, count: 3 },
-    { id: 'borders', label: 'Borders & Outlines', icon: Square, count: 2 },
-    { id: 'semantic', label: 'Semantic States', icon: AlertCircle, count: 4 }
-  ];
-
   return (
     <div className="color-editor-container">
       {/* Automatic Shade Generator Displayed Above */}
@@ -44,26 +77,6 @@ export default function ColorEditor({
         onApplyAsSecondary={(hex) => handleFieldChange('brand', 'secondary', hex)}
         onApplyAsAccent={(hex) => handleFieldChange('brand', 'accent', hex)}
       />
-
-      {/* Editor Section Navigation Tabs */}
-      <div className="editor-nav-tabs">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              className={`editor-tab-btn ${isActive ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              <Icon size={15} />
-              <span>{tab.label}</span>
-              <span className="tab-badge">{tab.count}</span>
-            </button>
-          );
-        })}
-      </div>
 
       {/* Tab Panels */}
       <div className="editor-tab-content">
@@ -257,4 +270,3 @@ export default function ColorEditor({
     </div>
   );
 }
-

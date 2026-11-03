@@ -1,0 +1,40 @@
+{
+  "id": "cobalt-citrus-light",
+  "name": "Cobalt & Citrus",
+  "description": "A confident cobalt interface energized with bright citrus accents and cool neutrals",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-03T00:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#2457A6",
+      "primaryHover": "#1C4484",
+      "primaryLight": "#EAF1FC",
+      "secondary": "#397BC1",
+      "accent": "#C58A24"
+    },
+    "backgrounds": {
+      "background": "#F5F8FC",
+      "surface": "#FFFFFF",
+      "sidebar": "#1E3150",
+      "sidebarText": "#F5F8FC",
+      "sidebarMuted": "#AABBD4",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#DFE7F1"
+    },
+    "typography": {
+      "textPrimary": "#202B3C",
+      "textSecondary": "#526177",
+      "textMuted": "#8290A3"
+    },
+    "borders": {
+      "border": "#DFE7F1",
+      "borderStrong": "#C6D2E2"
+    },
+    "semantic": {
+      "success": "#34805C",
+      "warning": "#B77A25",
+      "danger": "#B74747",
+      "info": "#2876AE"
+    }
+  }
+}

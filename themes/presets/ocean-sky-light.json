@@ -1,0 +1,40 @@
+{
+  "id": "ocean-sky-light",
+  "name": "Ocean & Sky",
+  "description": "A clear, contemporary blue palette inspired by open skies and coastal campuses",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-03T00:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#1677A8",
+      "primaryHover": "#105F87",
+      "primaryLight": "#E8F5FC",
+      "secondary": "#299FC1",
+      "accent": "#E59A3A"
+    },
+    "backgrounds": {
+      "background": "#F4FAFD",
+      "surface": "#FFFFFF",
+      "sidebar": "#123B57",
+      "sidebarText": "#F4FAFD",
+      "sidebarMuted": "#9BC5D8",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#DCEBF2"
+    },
+    "typography": {
+      "textPrimary": "#183040",
+      "textSecondary": "#486273",
+      "textMuted": "#7D96A4"
+    },
+    "borders": {
+      "border": "#DCEBF2",
+      "borderStrong": "#BDD5E1"
+    },
+    "semantic": {
+      "success": "#258265",
+      "warning": "#C18120",
+      "danger": "#C94C4C",
+      "info": "#1677A8"
+    }
+  }
+}

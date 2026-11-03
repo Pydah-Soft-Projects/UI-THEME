@@ -1,0 +1,40 @@
+{
+  "id": "plum-gold-light",
+  "name": "Plum & Gold",
+  "description": "A distinctive collegiate palette with deep plum branding and subtle gold accents",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-03T00:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#70466F",
+      "primaryHover": "#573653",
+      "primaryLight": "#F3ECF3",
+      "secondary": "#94688F",
+      "accent": "#B58A3A"
+    },
+    "backgrounds": {
+      "background": "#F9F6F9",
+      "surface": "#FFFFFF",
+      "sidebar": "#3E2C41",
+      "sidebarText": "#FBF7FB",
+      "sidebarMuted": "#C6B2C7",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#E9E0E9"
+    },
+    "typography": {
+      "textPrimary": "#2D2430",
+      "textSecondary": "#605361",
+      "textMuted": "#8D8190"
+    },
+    "borders": {
+      "border": "#E9E0E9",
+      "borderStrong": "#D5C7D6"
+    },
+    "semantic": {
+      "success": "#3D805F",
+      "warning": "#A97422",
+      "danger": "#B74753",
+      "info": "#4B729F"
+    }
+  }
+}

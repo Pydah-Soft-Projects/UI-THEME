@@ -1,0 +1,40 @@
+{
+  "id": "alpine-sage-light",
+  "name": "Alpine & Sage",
+  "description": "A calm, nature-inspired palette with evergreen accents and airy sage surfaces",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-03T00:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#47745B",
+      "primaryHover": "#365B46",
+      "primaryLight": "#EAF3ED",
+      "secondary": "#78977A",
+      "accent": "#C58B4E"
+    },
+    "backgrounds": {
+      "background": "#F6F9F6",
+      "surface": "#FFFFFF",
+      "sidebar": "#263D32",
+      "sidebarText": "#F5FAF6",
+      "sidebarMuted": "#AFC5B5",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#DFE9E1"
+    },
+    "typography": {
+      "textPrimary": "#202D25",
+      "textSecondary": "#526257",
+      "textMuted": "#819087"
+    },
+    "borders": {
+      "border": "#DFE9E1",
+      "borderStrong": "#C7D7CA"
+    },
+    "semantic": {
+      "success": "#34805C",
+      "warning": "#B77A25",
+      "danger": "#B74747",
+      "info": "#397A9C"
+    }
+  }
+}

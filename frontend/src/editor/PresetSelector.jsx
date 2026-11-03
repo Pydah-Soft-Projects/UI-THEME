@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Check, Sparkles, Search, Sun, Moon } from 'lucide-react';
+import { Check, Sparkles, Search, Sun, X } from 'lucide-react';
 
 export default function PresetSelector({
   presets = [],
@@ -8,14 +8,9 @@ export default function PresetSelector({
   onClose
 }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterMode, setFilterMode] = useState('all'); // 'all' | 'light' | 'dark'
 
   const filteredPresets = useMemo(() => {
     return presets.filter(preset => {
-      const isDark = preset.id.includes('dark') || preset.name.toLowerCase().includes('dark');
-      if (filterMode === 'light' && isDark) return false;
-      if (filterMode === 'dark' && !isDark) return false;
-
       if (searchTerm.trim()) {
         const query = searchTerm.toLowerCase();
         return (
@@ -26,7 +21,7 @@ export default function PresetSelector({
       }
       return true;
     });
-  }, [presets, filterMode, searchTerm]);
+  }, [presets, searchTerm]);
 
   return (
     <div className="preset-selector-container">
@@ -34,10 +29,10 @@ export default function PresetSelector({
         <div>
           <div className="flex-items-center gap-2">
             <Sparkles size={16} className="text-forest-green" />
-            <h3 className="font-semibold text-sm">Theme Presets Library ({presets.length} Available)</h3>
+            <h3 className="font-semibold text-sm">Light Theme Presets ({filteredPresets.length} Available)</h3>
           </div>
           <span className="text-xs text-muted">
-            Select any preset to immediately load its complete palette into your working draft.
+            Choose a starting palette. Selecting a preset replaces the colors in your working draft.
           </span>
         </div>
 
@@ -54,29 +49,16 @@ export default function PresetSelector({
             />
           </div>
 
-          <div className="preset-filter-pills">
-            <button
-              type="button"
-              className={`preset-pill ${filterMode === 'all' ? 'active' : ''}`}
-              onClick={() => setFilterMode('all')}
-            >
-              All ({presets.length})
-            </button>
-            <button
-              type="button"
-              className={`preset-pill ${filterMode === 'light' ? 'active' : ''}`}
-              onClick={() => setFilterMode('light')}
-            >
-              <Sun size={11} /> Light
-            </button>
-            <button
-              type="button"
-              className={`preset-pill ${filterMode === 'dark' ? 'active' : ''}`}
-              onClick={() => setFilterMode('dark')}
-            >
-              <Moon size={11} /> Dark
-            </button>
-          </div>
+          <span className="preset-light-indicator"><Sun size={13} /> Light palettes</span>
+          <button
+            type="button"
+            className="preset-close-button"
+            onClick={onClose}
+            aria-label="Close theme presets"
+            title="Close presets"
+          >
+            <X size={16} />
+          </button>
         </div>
       </div>
 
@@ -89,13 +71,13 @@ export default function PresetSelector({
           const surface = preset.colors?.backgrounds?.surface || '#FFFFFF';
           const accent = preset.colors?.brand?.accent || '#0E8388';
           const text = preset.colors?.typography?.textPrimary || '#252B27';
-          const isDark = preset.id.includes('dark');
-
           return (
-            <div
+            <button
+              type="button"
               key={preset.id}
               className={`preset-card ${isSelected ? 'active-preset' : ''}`}
               onClick={() => onSelectPreset(preset)}
+              aria-pressed={isSelected}
             >
               <div className="preset-card-header">
                 <div className="flex-items-center gap-2">
@@ -108,7 +90,7 @@ export default function PresetSelector({
                 {isSelected ? (
                   <span className="preset-badge"><Check size={11} /> Active Draft</span>
                 ) : (
-                  <span className="preset-type-chip">{isDark ? 'Dark Mode' : 'Light Mode'}</span>
+                  <span className="preset-type-chip">Light Mode</span>
                 )}
               </div>
 
@@ -123,10 +105,14 @@ export default function PresetSelector({
                 <div className="palette-pill" style={{ backgroundColor: surface }} title={`Surface: ${surface}`} />
                 <div className="palette-pill" style={{ backgroundColor: text }} title={`Text: ${text}`} />
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
+
+      {filteredPresets.length === 0 && (
+        <p className="preset-empty-state">No presets match your search. Try another name or filter.</p>
+      )}
     </div>
   );
 }

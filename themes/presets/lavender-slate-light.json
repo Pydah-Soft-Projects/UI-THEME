@@ -1,0 +1,40 @@
+{
+  "id": "lavender-slate-light",
+  "name": "Lavender & Slate",
+  "description": "A calm academic palette pairing soft lavender accents with crisp slate surfaces",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-03T00:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#6D5BD0",
+      "primaryHover": "#5846B8",
+      "primaryLight": "#F0EDFF",
+      "secondary": "#8B7BE8",
+      "accent": "#D66BA0"
+    },
+    "backgrounds": {
+      "background": "#F8F7FC",
+      "surface": "#FFFFFF",
+      "sidebar": "#302B4A",
+      "sidebarText": "#F8F7FF",
+      "sidebarMuted": "#C2BADF",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#E8E5F0"
+    },
+    "typography": {
+      "textPrimary": "#252238",
+      "textSecondary": "#5E5A70",
+      "textMuted": "#89859A"
+    },
+    "borders": {
+      "border": "#E8E5F0",
+      "borderStrong": "#D2CDE0"
+    },
+    "semantic": {
+      "success": "#168A68",
+      "warning": "#C77B16",
+      "danger": "#C84655",
+      "info": "#4D78C8"
+    }
+  }
+}

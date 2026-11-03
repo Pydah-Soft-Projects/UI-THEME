@@ -1,14 +1,29 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Header from './components/Header';
 import ThemeOverview from './editor/ThemeOverview';
-import ColorEditor from './editor/ColorEditor';
+import ColorEditor, { EDITOR_SECTIONS } from './editor/ColorEditor';
 import PresetSelector from './editor/PresetSelector';
 import LivePreview from './preview/LivePreview';
 import CreateThemeModal from './components/CreateThemeModal';
 import DocsModal from './components/DocsModal';
 import { generateCssVariablesMap, generateShades } from './utils/colorUtils';
-import { AlertCircle, CheckCircle, Info } from 'lucide-react';
+import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle, RotateCcw } from 'lucide-react';
 import './App.css';
+
+const WORKFLOW_STEPS = [
+  ...EDITOR_SECTIONS.map(({ id, label, title, description }) => ({
+    id,
+    label,
+    title,
+    description
+  })),
+  {
+    id: 'preview',
+    label: 'Live Preview',
+    title: 'Review your theme',
+    description: 'Check the finished palette across desktop, tablet, and mobile layouts.'
+  }
+];
 
 export default function App() {
   const [status, setStatus] = useState(null);
@@ -23,6 +38,8 @@ export default function App() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDocsModal, setShowDocsModal] = useState(false);
   const [toast, setToast] = useState(null);
+  const [activePage, setActivePage] = useState('brand');
+  const [highlightRequest, setHighlightRequest] = useState(0);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -67,6 +84,9 @@ export default function App() {
     if (!draftTheme || !draftTheme.colors) return {};
     return generateCssVariablesMap(draftTheme.colors);
   }, [draftTheme]);
+
+  const activePageIndex = WORKFLOW_STEPS.findIndex(step => step.id === activePage);
+  const currentStep = WORKFLOW_STEPS[activePageIndex];
 
   // Handle color change in draft
   const handleColorChange = (section, key, newHex) => {
@@ -180,7 +200,6 @@ export default function App() {
       name: `${preset.name} (Draft)`,
       colors: JSON.parse(JSON.stringify(preset.colors))
     }));
-    setShowPresets(false);
     showToast(`Loaded preset "${preset.name}" into working draft.`);
   };
 
@@ -269,40 +288,94 @@ export default function App() {
         showPresets={showPresets}
       />
 
-      {/* Presets Drawer if toggled */}
-      {showPresets && (
-        <PresetSelector
-          presets={presets}
-          currentThemeId={draftTheme?.id}
-          onSelectPreset={handleSelectPreset}
-          onClose={() => setShowPresets(false)}
-        />
-      )}
+      <main className="editor-workflow">
+        <nav className="workflow-stepper" aria-label="Theme editing steps">
+          {WORKFLOW_STEPS.map((step, index) => (
+            <button
+              key={step.id}
+              type="button"
+              className={`workflow-step ${activePage === step.id ? 'active' : ''} ${index < activePageIndex ? 'completed' : ''}`}
+              onClick={() => {
+                setActivePage(step.id);
+                setHighlightRequest(request => request + 1);
+              }}
+              aria-current={activePage === step.id ? 'step' : undefined}
+            >
+              <span className="workflow-step-number">
+                {index < activePageIndex ? <CheckCircle size={15} /> : index + 1}
+              </span>
+              <span className="workflow-step-label">{step.label}</span>
+            </button>
+          ))}
+        </nav>
 
-      {/* Two-Column Editor & Live Preview Workspace */}
-      <div className="theme-workspace-grid">
-        {/* Left Column: Colour Configuration Editor & Automatic Shade Generator */}
-        <section className="workspace-column editor-column">
-          <div className="column-header">
-            <h2 className="column-title">Theme Palette Editor</h2>
-            <span className="text-xs text-muted">Instant reactive binding to live ERP preview</span>
+        <section className="workflow-page">
+          <div className={`workflow-content ${activePage === 'preview' ? 'preview-only' : ''}`}>
+            <div className="workflow-editor-panel" hidden={activePage === 'preview'}>
+              <ColorEditor
+                theme={draftTheme}
+                defaultTheme={activeTheme}
+                onChangeColor={handleColorChange}
+                activeTab={activePage}
+              />
+              {showPresets && (
+                <div className="preset-overlay" role="dialog" aria-label="Theme presets">
+                  <PresetSelector
+                    presets={presets}
+                    currentThemeId={draftTheme?.id}
+                    onSelectPreset={handleSelectPreset}
+                    onClose={() => setShowPresets(false)}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="workflow-preview-panel">
+              <LivePreview
+                cssVariables={liveCssVariables}
+                themeName={draftTheme?.name || 'Current Draft'}
+                highlightSection={activePage === 'preview' ? null : activePage}
+                highlightLabel={activePage === 'preview' ? null : currentStep.label}
+                highlightRequest={highlightRequest}
+              />
+            </div>
           </div>
 
-          <ColorEditor
-            theme={draftTheme}
-            defaultTheme={activeTheme}
-            onChangeColor={handleColorChange}
-          />
+          <div className="workflow-navigation">
+            <button
+              type="button"
+              className="workflow-navigation-button secondary"
+              onClick={() => setActivePage(WORKFLOW_STEPS[Math.max(0, activePageIndex - 1)].id)}
+              disabled={activePageIndex === 0}
+            >
+              <ArrowLeft size={16} />
+              <span>Previous</span>
+            </button>
+            <span className="workflow-navigation-hint">
+              Your changes are applied to the live preview automatically.
+            </span>
+            {activePageIndex < WORKFLOW_STEPS.length - 1 ? (
+              <button
+                type="button"
+                className="workflow-navigation-button primary"
+                onClick={() => setActivePage(WORKFLOW_STEPS[activePageIndex + 1].id)}
+              >
+                <span>{activePageIndex === WORKFLOW_STEPS.length - 2 ? 'Review theme' : 'Next step'}</span>
+                <ArrowRight size={16} />
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="workflow-navigation-button primary"
+                onClick={() => setActivePage(WORKFLOW_STEPS[0].id)}
+              >
+                <RotateCcw size={15} />
+                <span>Back to editing</span>
+              </button>
+            )}
+          </div>
         </section>
-
-        {/* Right Column: Educational ERP Live Preview */}
-        <section className="workspace-column preview-column">
-          <LivePreview
-            cssVariables={liveCssVariables}
-            themeName={draftTheme?.name || 'Current Draft'}
-          />
-        </section>
-      </div>
+      </main>
 
       {/* Modals */}
       <CreateThemeModal
@@ -318,4 +391,3 @@ export default function App() {
     </div>
   );
 }
-

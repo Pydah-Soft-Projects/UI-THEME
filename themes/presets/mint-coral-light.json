@@ -1,0 +1,40 @@
+{
+  "id": "mint-coral-light",
+  "name": "Mint & Coral",
+  "description": "A fresh and friendly campus palette pairing cool mint with warm coral highlights",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-03T00:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#167B72",
+      "primaryHover": "#105F58",
+      "primaryLight": "#E6F5F2",
+      "secondary": "#319B8D",
+      "accent": "#D66B55"
+    },
+    "backgrounds": {
+      "background": "#F4FAF8",
+      "surface": "#FFFFFF",
+      "sidebar": "#183E3B",
+      "sidebarText": "#F3FBF8",
+      "sidebarMuted": "#A8CFC5",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#DCECE7"
+    },
+    "typography": {
+      "textPrimary": "#1C302D",
+      "textSecondary": "#4D6660",
+      "textMuted": "#7D9690"
+    },
+    "borders": {
+      "border": "#DCECE7",
+      "borderStrong": "#BED9D0"
+    },
+    "semantic": {
+      "success": "#2F805F",
+      "warning": "#B87924",
+      "danger": "#C34D48",
+      "info": "#317A9A"
+    }
+  }
+}

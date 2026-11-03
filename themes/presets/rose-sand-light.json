@@ -1,0 +1,40 @@
+{
+  "id": "rose-sand-light",
+  "name": "Rose & Sand",
+  "description": "A refined and approachable palette with muted rose accents and warm neutral surfaces",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-03T00:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#A94F68",
+      "primaryHover": "#873C53",
+      "primaryLight": "#F9EDF1",
+      "secondary": "#C66A80",
+      "accent": "#B58A45"
+    },
+    "backgrounds": {
+      "background": "#FAF7F6",
+      "surface": "#FFFFFF",
+      "sidebar": "#49343D",
+      "sidebarText": "#FFF8FA",
+      "sidebarMuted": "#D3B4BE",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#EDE2E4"
+    },
+    "typography": {
+      "textPrimary": "#30252A",
+      "textSecondary": "#68575D",
+      "textMuted": "#93838A"
+    },
+    "borders": {
+      "border": "#EDE2E4",
+      "borderStrong": "#DCCBD0"
+    },
+    "semantic": {
+      "success": "#3B8065",
+      "warning": "#B47B2B",
+      "danger": "#B64550",
+      "info": "#487FA5"
+    }
+  }
+}

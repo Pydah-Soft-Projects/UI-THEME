@@ -1,0 +1,40 @@
+{
+  "id": "azure-ice-light",
+  "name": "Azure & Ice",
+  "description": "A crisp blue palette with layered azure accents and cool, bright surfaces",
+  "version": "1.0.0",
+  "lastPublished": "2026-11-03T00:00:00.000Z",
+  "colors": {
+    "brand": {
+      "primary": "#1976D2",
+      "primaryHover": "#125EAA",
+      "primaryLight": "#E8F3FF",
+      "secondary": "#42A5F5",
+      "accent": "#00A6A6"
+    },
+    "backgrounds": {
+      "background": "#F4F9FE",
+      "surface": "#FFFFFF",
+      "sidebar": "#163B63",
+      "sidebarText": "#F5FAFF",
+      "sidebarMuted": "#A9C6E2",
+      "navbar": "#FFFFFF",
+      "navbarBorder": "#DCEAF6"
+    },
+    "typography": {
+      "textPrimary": "#1B2D40",
+      "textSecondary": "#4C6278",
+      "textMuted": "#7F95A8"
+    },
+    "borders": {
+      "border": "#DCEAF6",
+      "borderStrong": "#BED4E8"
+    },
+    "semantic": {
+      "success": "#27825D",
+      "warning": "#B87924",
+      "danger": "#C34D4D",
+      "info": "#1976D2"
+    }
+  }
+}
